@@ -12,10 +12,10 @@ import math
 # Specify the title of the Wikipedia page
 wikipedia.set_lang("es")
 pathsrc = "c:/tmp/"
-country = "austria"
+country = "españa"
 #country = input("Indique el país: ")
 #ciudad = input("Indique la ciudad: ")
-ciudad = "praga"
+ciudad = "barcelona"
 termino = input("Indique el lugar: ")
 terminoorig = termino
 #parametros = len(sys.argv)
