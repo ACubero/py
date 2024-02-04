@@ -12,10 +12,10 @@ import math
 # Specify the title of the Wikipedia page
 wikipedia.set_lang("es")
 pathsrc = "c:/tmp/"
-country = "españa"
 #country = input("Indique el país: ")
 #ciudad = input("Indique la ciudad: ")
-ciudad = "barcelona"
+country = "España";
+ciudad = "Málaga";
 termino = input("Indique el lugar: ")
 terminoorig = termino
 #parametros = len(sys.argv)
@@ -62,6 +62,15 @@ while i < 100:
 #text = text.replace('\n', '')
 
 print("Reemplanzando carácteres...")
+print(text)
+text = text.strip()
+text = text.replace('=== ','')
+text = text.replace(' ===','.')
+text = text.replace('== ','')
+text = text.replace(' ==','.')
+text = text.replace('\n\n','\n')
+text = text.replace('\t','')
+#text = text.replace('.','.\n')
 text = text.replace('[cita requerida]','')
 text = text.replace('/km²',' por kilómetro cuadrado')
 text = text.replace('km²','kilómetro cuadrado')
@@ -91,9 +100,13 @@ text = text.replace(' I.',' primero.')
 text = text.replace('(I)','(primero)')
 text = text.replace('=','')
 text = text.replace(' 000','000')
-text = text.replace('. ','.\n')
-text = text.replace('\t','')
-text = text.replace('\n\n','\n')
+text = text.replace('ml.','mililitros')
+text = text.replace('a. C.','antes de Cristo')
+text = text.replace('a.C.','antes de Cristo')
+text = text.replace('d. C.','después de Cristo')
+text = text.replace('d.C.','después de Cristo')
+
+
 
 # Creamos el fichero TXT
 ext = ".txt"
@@ -129,10 +142,7 @@ print("Moviendo fichero >> "+filewithpathHTML+" a "+filewithpathHTMLdest)
 shutil.move(filewithpathHTML, filewithpathHTMLdest)
 
 # Abrir la URL
-# Ruta Chrome PC SOBREMESA
 webbrowser.register('chrome',None,webbrowser.BackgroundBrowser("C:/Program Files/Google/Chrome/Application/chrome.exe"))
-# Ruta Chrome Portátil
-# webbrowser.register('chrome',None,webbrowser.BackgroundBrowser("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"))
 webbrowser.get('chrome').open(url)
 
 # Creamos el fichero URL
@@ -141,12 +151,8 @@ geo = Nominatim(user_agent="MyApp")
 
 lugar = terminoorig+","+ciudad
 loc = geo.geocode(lugar)
-try:
-    print("Coordenadas: "+loc.latitude,loc.longitude)
-    coordenadas = str(loc.latitude)+","+str(loc.longitude)
-except:
-    print("Coordenadas no localizadas")    
-    coordenadas = ""
+print(loc.latitude,loc.longitude)
+coordenadas = str(loc.latitude)+","+str(loc.longitude)
 
 ext = ".txt"
 filewithpathURL = "".join([pathsrc,filename+'-URL',ext])
