@@ -1,0 +1,8 @@
+=== Instalación ===
+Ten en cuenta que el fichero descargado es de tipo ZIP y es necesario descomprimirlo 
+para poder usar su contenido en Jupyter Notebook.
+
+
+=== Apuntes online ===
+Todos estos apuntes están disponibles de forma online en mi archivo de documentos:
+https://docs.hektorprofe.net/python/
