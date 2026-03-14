@@ -2,6 +2,12 @@
  * ui.js — Renderizado de la lista unificada de próximos buses
  */
 
+// Elimina caracteres fuera del rango latino (corrupción en BD de EMTUSA)
+function fixText(str) {
+  if (!str) return str;
+  return str.replace(/[^\x20-\x7E\u00A0-\u024F]/g, "").trim();
+}
+
 // Colores fallback por línea
 const LINE_COLORS = [
   "#ef4444",
@@ -90,7 +96,7 @@ export function renderArrivals(arrivals, onRowClick, opts = {}) {
       return `
         <div class="arrival-row" data-idx="${i}">
           <div class="arrival-badge" style="background:${color};color:${textColor}">L${a.lineId}</div>
-          <div class="arrival-direction">${a.direction}</div>
+          <div class="arrival-direction">${fixText(a.direction)}</div>
           <button class="fav-btn${isFav ? " active" : ""}" data-stop-id="${a.stopId}" aria-label="${isFav ? "Quitar de favoritos" : "Añadir a favoritos"}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
           <div class="arrival-time-box">
             <div class="arrival-min ${timeClass}">${timeText}</div>
@@ -99,7 +105,7 @@ export function renderArrivals(arrivals, onRowClick, opts = {}) {
             <span class="arrival-stop-badge" style="background:${color};color:${textColor}">${a.stopId}</span>
             ${distText ? `<span class="arrival-dist">(${distText})</span>` : ""}
           </div>
-          <div class="arrival-stop-name">${a.stopName}</div>
+          <div class="arrival-stop-name">${fixText(a.stopName)}</div>
         </div>`;
     })
     .join("");
@@ -141,9 +147,18 @@ export function showLoading(loaded, total) {
 /**
  * Actualizar badge de refresco
  */
-export function updateRefreshBadge(seconds) {
+export function updateRefreshBadge(seconds, paused = false) {
   const el = document.getElementById("refresh-timer");
-  if (el) el.textContent = `${seconds}s`;
+  if (!el) return;
+  if (paused) {
+    el.textContent = "II";
+    el.classList.add("paused");
+  } else {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    el.textContent = m > 0 ? `${m}:${String(s).padStart(2, "0")}` : `${seconds}s`;
+    el.classList.remove("paused");
+  }
 }
 
 /**

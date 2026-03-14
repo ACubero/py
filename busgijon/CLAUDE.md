@@ -43,18 +43,32 @@ row1: —          DESTINO (span)  —         ♥ fav-btn
 row2: [L12]      220  (166 m)    —         08
 row3: [   ]      Nombre parada   —         —
 ```
-- Badge línea (col1, rows 2-3): cuadrado (`aspect-ratio:1`), color de línea
-- Badge parada `220` (meta-row, sin `#`): mismo color que la línea; distancia entre paréntesis
+- Badge línea (col1, rows 2-3): cuadrado (`aspect-ratio:1`), color de línea; `font-size: 21px` (base), `24px` (large-text); `min-width: 58px`
+- Badge parada `220` (meta-row, sin `#`): mismo color que la línea; distancia entre paréntesis; `font-size: 21px` (base), `24px` (large-text)
+- Ambos badges con el mismo `font-size` siempre
 - Tiempo: siempre 2 dígitos (`padStart(2,"0")`); bus en parada → solo `⬤` sin texto; NO hay `.arrival-label`
 - Fav: corazón SVG, `color: var(--accent)` siempre; `.active svg path { fill: currentColor }`
 - Header: sort buttons (`sort-time`, `sort-dist`) en `header-right` como `btn-icon sort-toggle`; NO hay `.sort-bar`
 - Búsqueda: sin icono lupa, `padding-top: 10px`
 - Tema oscuro/claro: clase `html.light-theme` en CSS; `setMapTheme()` la activa en `map.js`
 
+## Temporizador de refresco
+- Badge `#refresh-timer` en header: muestra cuenta atrás; **clic → pausa/reanuda** (`state.refreshPaused`)
+- Pausado: texto `II`, clase `.paused` (borde y color `var(--accent)`)
+- Formato: `Xs` si < 60 s; `M:SS` si ≥ 60 s
+- Intervalo configurable en Ajustes (`<select id="refresh-interval">`): 30s, 1min, 1:30, 2min, 5min, 10min, 15min, 30min
+- Se guarda en `localStorage` clave `bus_refresh_interval`; se aplica al instante sin recargar
+
 ## Asistente IA
 - FAB circular fijo abajo-derecha; solo visible en vistas `list` y `map`
 - Overlay chat 72vh deslizante desde abajo; quick actions grid 3 cols
 - Proveedores: Anthropic, OpenAI, Deepseek, Gemini (config en Settings)
+
+## Sanitización de texto (`fixText`)
+- Los textos de la API (trayectos, paradas, nombres de línea) pueden contener caracteres corruptos de la BD de EMTUSA (ej. `❤` en lugar de `Ñ`).
+- Función `fixText(str)` en `ui.js` y `map.js`: elimina caracteres fuera del rango latino (`/[^\x20-\x7E\u00A0-\u024F]/g`), preservando acentos y ñ.
+- Aplicar siempre a: `a.direction`, `a.stopName`, `stop.descripcion`, `bus.destination`, `bus.lineName`.
+- La API devuelve UTF-8; usar `res.json()` directamente (nunca `TextDecoder` con otro charset).
 
 ## Notas
 - `samples/base/` → assets de APK Android (Capacitor). Solo referencia, no editar.
