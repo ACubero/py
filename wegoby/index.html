@@ -11,10 +11,17 @@
     <title>Wegoby</title>
   </head>
   <body>
-    <main id="app">
-      <h1>Wegoby</h1>
-      <p>Tu tratamiento, día a día.</p>
+    <header class="app-header">
+      <button type="button" class="icon-button" id="back-button" aria-label="Volver" hidden>
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <h1 id="app-title">Wegoby</h1>
+    </header>
+    <main id="app" tabindex="-1">
+      <p>Cargando…</p>
     </main>
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Secciones"></nav>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
     <div id="update-banner" class="update-banner" hidden>
       <span>Hay una versión nueva.</span>
       <button type="button" id="update-button">Actualizar</button>

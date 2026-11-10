@@ -30,21 +30,21 @@ Route: all inline unless a Writer trigger fires (record evidence here).
 
 ### Phase 0 — Foundation
 - [x] T01 S1 · inline · Scaffold Vite + vanilla JS + `vite-plugin-pwa`; manifest, icons, offline service worker; Vitest setup. RED (missing module) → GREEN 2/2; build emits sw.js + manifest.webmanifest.
-- [ ] T02 S5 · inline · Design tokens (light/dark), adjustable font scale, ≥48 px targets, AA contrast, inline SVG icon set (no emojis).
-- [ ] T03 S8 · inline · IndexedDB layer (`idb`): stores settings, doses, meds, water, protein, symptoms, workouts, pain, weights, labs, bp; versioned migrations.
-- [ ] T04 S8 · inline · Backup export/import JSON with schema validation.
-- [ ] T05 S5 S6 S9 · inline · Onboarding: profile (age, height, weight, Wegovy start day, levothyroxine time), disclaimer, pre-exercise questionnaire, physio-clearance flag.
-- [ ] T06 S1 · inline · Navigation shell + "Hoy" dashboard (next dose, water, protein, weekly exercise, quick symptom button).
+- [x] T02 S5 · inline · Design tokens (light/dark), adjustable font scale, ≥48 px targets, AA contrast, inline SVG icon set (no emojis).
+- [x] T03 S8 · inline · IndexedDB layer (`idb`): stores settings, doses, meds, water, protein, symptoms, workouts, pain, weights, labs, bp; versioned migrations.
+- [x] T04 S8 · inline · Backup export/import JSON with schema validation.
+- [x] T05 S5 S6 S9 · inline · Onboarding: profile (age, height, weight, Wegovy start day, levothyroxine time), disclaimer, pre-exercise questionnaire, physio-clearance flag.
+- [x] T06 S1 · inline · Navigation shell + "Hoy" dashboard (next dose, water, protein, weekly exercise, quick symptom button).
 
 ### Phase 1 — MVP
-- [ ] T07 S2 · inline · Dose-schedule engine (pure functions): escalation, configurable delays, next dose date. Tests.
-- [ ] T08 S2 · inline · Dose log UI with site-rotation suggestion (abdomen, thigh, arm).
-- [ ] T09 S2 · inline · Missed-dose assistant (48 h rule). Tests per branch.
-- [ ] T10 S2 · inline · Pen tracking: open date, doses remaining, in-use limit configurable.
-- [ ] T11 S6 · inline · Medication module: levothyroxine schedule, spacing rules (≥ 4 h calcium/iron, coffee/soy/fibre note), optional calcium/calcitriol; collision-free scheduler. Tests.
-- [ ] T12 S4 S7 · inline · Water tracker: +250/+500 ml, goal 2.0 L configurable, local-midnight reset.
-- [ ] T13 S5 S7 · inline · Protein tracker: adjusted body weight = IBW + 0.4 × (actual − IBW), formula and g/kg configurable; quick-add foods with protein grams from BEDCA. Tests.
-- [ ] T14 S6 S9 · inline · Symptoms log (GI, thyroid, hypocalcemia, 0–3) + red-flag rules → fixed warning.
+- [x] T07 S2 · inline · Dose-schedule engine (pure functions): escalation, configurable delays, next dose date. Tests.
+- [x] T08 S2 · inline · Dose log UI with site-rotation suggestion (abdomen, thigh, arm).
+- [x] T09 S2 · inline · Missed-dose assistant (48 h rule). Tests per branch.
+- [x] T10 S2 · inline · Pen tracking: open date, doses remaining, in-use limit configurable.
+- [x] T11 S6 · inline · Medication module: levothyroxine schedule, spacing rules (≥ 4 h calcium/iron, coffee/soy/fibre note), optional calcium/calcitriol; collision-free scheduler. Tests.
+- [x] T12 S4 S7 · inline · Water tracker: +250/+500 ml, goal 2.0 L configurable, local-midnight reset.
+- [x] T13 S5 S7 · inline · Protein tracker: adjusted body weight = IBW + 0.4 × (actual − IBW), formula and g/kg configurable; quick-add foods with protein grams from BEDCA. Tests.
+- [x] T14 S6 S9 · inline · Symptoms log (GI, thyroid, hypocalcemia, 0–3) + red-flag rules → fixed warning.
 - [ ] T15 S4 S8 · inline · Push backend: Cloudflare Worker + KV + Cron `*/15`; VAPID; endpoints subscribe/unsubscribe/schedule/goal-met; per-device random token; no health data. **Risk: item 2 (credentials/VAPID secrets)** → own commit, independent verifier.
 - [ ] T16 S4 · inline · Push client: permission flow, subscription, schedule sync, SW `push` + `notificationclick` (deep link, "+250 ml" action).
 - [ ] T17 S1 S4 · inline · Deploy Cloudflare Pages + Worker, secrets, HTTPS. **Risk: item 5 (deploy)**.
@@ -76,3 +76,4 @@ Route: all inline unless a Writer trigger fires (record evidence here).
 - L5 (2026-11-10) User: "crea un md con todas las tareas necesarias". Plan-only; no source written. Next: T01 on user go-ahead.
 - L6 (2026-11-10) User: "si usas python cra un venv". Stack is JS-only; any Python helper script (e.g. T20 video checks, T31 source checks) runs in `wegoby/.venv`, git-ignored.
 - L7 (2026-11-10) User: "empieza con T01". Done on branch `feat/wegoby-pwa` (repo root `C:\Proyectos\py`). Versions: vite 7.3.8, vite-plugin-pwa 2.0.0, vitest 5.1.0, @vite-pwa/assets-generator 2.0.0. `npm audit`: 6 low/moderate in build-time-only transitive deps (workbox-build, glob, minimatch, deepmerge); nothing shipped to the browser. SW uses `registerType: 'prompt'` with update banner. Next: T02.
+- L8 (2026-11-10) User: "sigue con el resto de tareas". T02–T14 inline (no Writer trigger: sequential dependent units). Evidence: RED per test file (missing modules / doseStatus) → GREEN 58/58 (foundation 13, domain 28, views smoke 17 with happy-dom + fake-indexeddb). Decisions: missed-dose rule implemented as SmPC wording "within 5 days" (≡ >48 h before next weekly dose); water reminder slots 15 min, last slot at bedtime−2 h only if ≥ interval/2 after previous; protein default 1.2 g/kg adjusted (Devine IBW + 0.4 excess), configurable; pen default 4 doses / 42 days, configurable, user told to check leaflet. T20 videos curated in background (32 IDs, oEmbed 200, 2026-11-10).
