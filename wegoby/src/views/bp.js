@@ -2,9 +2,9 @@ import { html } from '../ui/html.js';
 import { icon } from '../ui/icons.js';
 import { readForm, toast, on } from '../ui/dom.js';
 import { allRecords, addRecord, deleteRecord } from '../db/index.js';
-import { dayKey, localIso, formatDay } from '../domain/dates.js';
+import { localIso, formatDay } from '../domain/dates.js';
 import { evaluateBp } from '../domain/bp.js';
-import { deleteButton, alertBox, sourceNote, timeOf } from './common.js';
+import { deleteButton, alertBox, sourceNote, timeOf, dayField, atFor } from './common.js';
 
 export const title = 'Tensión arterial';
 
@@ -20,6 +20,7 @@ export async function render() {
           <div class="field" style="flex:1"><label for="bp-sys">Alta (sistólica)</label><input id="bp-sys" name="sys" type="number" inputmode="numeric" min="60" max="260" required /></div>
           <div class="field" style="flex:1"><label for="bp-dia">Baja (diastólica)</label><input id="bp-dia" name="dia" type="number" inputmode="numeric" min="30" max="160" required /></div>
         </div>
+        ${dayField('bp-day')}
         <div class="field"><label for="bp-pulse">Pulso (opcional)</label><input id="bp-pulse" name="pulse" type="number" inputmode="numeric" min="30" max="220" /></div>
         <button type="submit" class="btn btn-primary">Guardar</button>
       </form>
@@ -37,8 +38,8 @@ export async function render() {
 export function bind(root, ctx) {
   root.querySelector('#bp-form').addEventListener('submit', async (event) => {
     event.preventDefault();
-    const values = readForm(event.currentTarget);
-    await addRecord('bp', { at: localIso(), day: dayKey(), ...values });
+    const { day, ...values } = readForm(event.currentTarget);
+    await addRecord('bp', { at: localIso(atFor(day)), day, ...values });
     toast('Medida guardada.');
     ctx.refresh();
   });

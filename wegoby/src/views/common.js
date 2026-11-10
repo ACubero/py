@@ -2,6 +2,7 @@ import { html } from '../ui/html.js';
 import { icon } from '../ui/icons.js';
 import { getSetting, allRecords } from '../db/index.js';
 import { SEVERITY_LABELS } from '../domain/symptoms.js';
+import { dayKey, addDays, fromDayKey, parseDayParam, dateOnDay } from '../domain/dates.js';
 
 export async function loadSettings(...keys) {
   const values = await Promise.all(keys.map((key) => getSetting(key)));
@@ -54,4 +55,30 @@ export function deleteButton(store, id, label = 'Borrar') {
 
 export function sourceNote(text) {
   return html`<p class="small muted">${icon('book', { size: 16 })} Fuente: ${text}</p>`;
+}
+
+export function dayNav(route, day) {
+  const today = dayKey();
+  const prev = dayKey(addDays(fromDayKey(day), -1));
+  const next = dayKey(addDays(fromDayKey(day), 1));
+  return html`<nav class="day-nav" aria-label="Elegir día">
+    <a class="icon-button" href="#/${route}/${prev}" aria-label="Día anterior">${icon('back')}</a>
+    <label class="day-nav-label"><span class="sr-only">Día</span><input type="date" data-day-nav="${route}" value="${day}" max="${today}" /></label>
+    ${day < today ? html`<a class="icon-button" href="#/${route}/${next}" aria-label="Día siguiente">${icon('chevron')}</a><a class="btn btn-soft" href="#/${route}">Hoy</a>` : ''}
+  </nav>`;
+}
+
+export function bindDayNav(root, ctx) {
+  root.querySelector('[data-day-nav]')?.addEventListener('change', (event) => {
+    const { value, dataset } = event.currentTarget;
+    if (value) ctx.navigate(`${dataset.dayNav}/${parseDayParam(value)}`);
+  });
+}
+
+export function dayField(id, day = dayKey()) {
+  return html`<div class="field"><label for="${id}">Fecha</label><input id="${id}" name="day" type="date" value="${day}" max="${dayKey()}" required /></div>`;
+}
+
+export function atFor(day) {
+  return day === dayKey() ? new Date() : dateOnDay(day);
 }

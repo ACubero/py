@@ -6,7 +6,7 @@ import { dayKey, localIso, startOfWeek, formatDay } from '../domain/dates.js';
 import { ROUTINES, ZONES, MATERIALS, getExercise } from '../data/exercises.js';
 import { visibleExercises, progressionFor, weeksSinceFirstStrength, weeklySummary, RPE_HINT } from '../domain/exercise.js';
 import { evaluatePain } from '../domain/achilles.js';
-import { loadSettings, alertBox, progressBar, deleteButton, sourceNote } from './common.js';
+import { loadSettings, alertBox, progressBar, deleteButton, sourceNote, dayField, atFor } from './common.js';
 
 export function title(ctx) {
   return ctx?.params?.[0] ? (getExercise(ctx.params[0])?.name ?? 'Ejercicio') : 'Ejercicio';
@@ -152,6 +152,7 @@ export async function render(ctx) {
     <section class="card">
       <h2>Apuntar sesión</h2>
       <form id="workout-form">
+        ${dayField('wk-day')}
         <div class="field"><label for="wk-type">Tipo</label>
           <select id="wk-type" name="type"><option value="strength">Fuerza</option><option value="aerobic">Aeróbico o baile</option><option value="physio">Ejercicios del fisio</option></select></div>
         <div class="field"><label for="wk-activity">Actividad</label>
@@ -206,10 +207,10 @@ export async function render(ctx) {
     </section>`;
 }
 
-async function savePain(patch) {
-  const [existing] = await recordsForDay('pain', dayKey());
+async function savePain(patch, day = dayKey()) {
+  const [existing] = await recordsForDay('pain', day);
   if (existing) await putRecord('pain', { ...existing, ...patch, during: patch.during ?? existing.during, morning: patch.morning ?? existing.morning });
-  else await addRecord('pain', { day: dayKey(), during: patch.during ?? null, morning: patch.morning ?? null });
+  else await addRecord('pain', { day, during: patch.during ?? null, morning: patch.morning ?? null });
 }
 
 const ACTIVITY_LABELS = { 'routine-A': 'Rutina A', 'routine-B': 'Rutina B', physio: 'Pauta del fisio' };
@@ -257,8 +258,8 @@ export function bind(root, ctx) {
     event.preventDefault();
     const values = readForm(event.currentTarget);
     const label = ACTIVITY_LABELS[values.activity] ?? getExercise(values.activity)?.name ?? values.activity;
-    await addRecord('workouts', { at: localIso(), day: dayKey(), type: values.type, activity: values.activity, label, minutes: values.minutes, rpe: values.rpe, notes: values.notes });
-    if (values.during !== null) await savePain({ during: values.during });
+    await addRecord('workouts', { at: localIso(atFor(values.day)), day: values.day, type: values.type, activity: values.activity, label, minutes: values.minutes, rpe: values.rpe, notes: values.notes });
+    if (values.during !== null) await savePain({ during: values.during }, values.day);
     toast('Sesión guardada.');
     ctx.refresh();
   });

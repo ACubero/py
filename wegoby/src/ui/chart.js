@@ -79,3 +79,36 @@ export function barChart(buckets, { label, unit, marks = [], width = 320, height
     ${bars}
   </svg>`;
 }
+
+export function dailyTotals(records, field, days) {
+  const totals = new Map(days.map((day) => [day, 0]));
+  records.forEach((record) => {
+    if (totals.has(record.day)) totals.set(record.day, totals.get(record.day) + (Number(record[field]) || 0));
+  });
+  return [...totals].map(([day, value]) => ({ day, value }));
+}
+
+const SHORT_WEEKDAYS = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+
+export function dayBarChart(buckets, { label, unit, goal = 0, selected, width = 320, height = 120 }) {
+  const max = Math.max(...buckets.map((bucket) => bucket.value), goal, 1);
+  const slot = width / buckets.length;
+  const barWidth = Math.max(6, slot * 0.55);
+  const base = height - 18;
+  const scaleY = (value) => Math.round((value / max) * (base - 10));
+  const bars = buckets.map((bucket, index) => {
+    const barHeight = scaleY(bucket.value);
+    const x = round(index * slot + (slot - barWidth) / 2);
+    const [year, month, day] = bucket.day.split('-').map(Number);
+    const weekday = SHORT_WEEKDAYS[new Date(year, month - 1, day).getDay()];
+    const met = goal > 0 && bucket.value >= goal;
+    const cls = `bar${bucket.day === selected ? ' bar-selected' : ''}${met ? ' bar-met' : ''}`;
+    return html`<rect class="${cls}" x="${x}" y="${base - barHeight}" width="${round(barWidth)}" height="${Math.max(barHeight, bucket.value ? 2 : 0)}" rx="3"><title>${day}/${month} · ${bucket.value} ${unit}</title></rect>${raw(`<text x="${round(x + barWidth / 2)}" y="${height - 3}" text-anchor="middle">${weekday}${day}</text>`)}`;
+  });
+  const goalY = base - scaleY(goal);
+  return html`<svg class="day-bars" viewBox="0 0 ${width} ${height}" role="img" aria-label="${label}">
+    <line class="baseline" x1="0" x2="${width}" y1="${base}" y2="${base}" />
+    ${goal > 0 ? html`<line class="goal" x1="0" x2="${width}" y1="${goalY}" y2="${goalY}" />` : ''}
+    ${bars}
+  </svg>`;
+}

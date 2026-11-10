@@ -2,31 +2,34 @@ import { html } from '../ui/html.js';
 import { icon } from '../ui/icons.js';
 import { readForm, toast, on } from '../ui/dom.js';
 import { recordsForDay, addRecord, deleteRecord, setSetting } from '../db/index.js';
-import { dayKey, localIso } from '../domain/dates.js';
+import { dayKey, localIso, parseDayParam, dayLabel } from '../domain/dates.js';
 import { proteinTarget, idealWeightDevine, adjustedWeight, QUICK_FOODS, QUICK_FOODS_NOTE } from '../domain/protein.js';
-import { loadSettings, latestWeightKg, progressBar, timeOf, sourceNote, formatNumber } from './common.js';
+import { loadSettings, latestWeightKg, progressBar, timeOf, sourceNote, formatNumber, dayNav, bindDayNav, atFor } from './common.js';
 
 export const title = 'Proteína';
 
-export async function proteinSummary() {
+export async function proteinSummary(day = dayKey()) {
   const { profile, protein } = await loadSettings('profile', 'protein');
   const weightKg = await latestWeightKg();
-  const records = await recordsForDay('protein', dayKey());
+  const records = await recordsForDay('protein', day);
   const total = records.reduce((sum, record) => sum + record.grams, 0);
   const target = proteinTarget({ weightKg, heightCm: profile.heightCm, sex: profile.sex, gPerKg: protein.gPerKg, useAdjustedWeight: protein.useAdjustedWeight });
   return { profile, protein, weightKg, records, total, target };
 }
 
-export async function render() {
-  const { profile, protein, weightKg, records, total, target } = await proteinSummary();
+export async function render(ctx = {}) {
+  const day = parseDayParam(ctx.params?.[0]);
+  const label = dayLabel(day);
+  const { profile, protein, weightKg, records, total, target } = await proteinSummary(day);
   const reference =
     protein.useAdjustedWeight && profile.heightCm && weightKg ? adjustedWeight(weightKg, idealWeightDevine(profile.heightCm, profile.sex)) : weightKg;
 
   return html`
+    ${dayNav('proteina', day)}
     <section class="card">
-      <div class="card-title">${icon('egg')}<h2>Hoy</h2></div>
+      <div class="card-title">${icon('egg')}<h2>${label}</h2></div>
       <p class="big-number">${total} g <span class="muted small">${target ? html`de ${target} g` : 'sin objetivo'}</span></p>
-      ${target ? progressBar(total, target, 'Proteína de hoy') : html`<p class="small muted">Indica tu peso y altura para calcular el objetivo.</p>`}
+      ${target ? progressBar(total, target, `Proteína: ${label}`) : html`<p class="small muted">Indica tu peso y altura para calcular el objetivo.</p>`}
       <p class="small muted" style="margin-top:.5rem">Pon la proteína primero en el plato y repártela en 3–4 tomas.</p>
     </section>
     <section class="card">
@@ -40,10 +43,10 @@ export async function render() {
       </form>
     </section>
     <section class="card">
-      <h2>Registro de hoy</h2>
+      <h2>Registro · ${label}</h2>
       ${records.length
         ? html`<ul class="list">${records.map((record) => html`<li><span>${timeOf(record.at)} · ${record.label} · ${record.grams} g</span><button type="button" class="icon-button" data-remove="${record.id}" aria-label="Borrar">${icon('trash')}</button></li>`)}</ul>`
-        : html`<p class="muted">Aún no has apuntado proteína hoy.</p>`}
+        : html`<p class="muted">Sin proteína apuntada este día.</p>`}
     </section>
     <section class="card">
       <h2>Objetivo</h2>
@@ -58,8 +61,10 @@ export async function render() {
 }
 
 export function bind(root, ctx) {
+  const day = parseDayParam(ctx.params?.[0]);
+  bindDayNav(root, ctx);
   const add = async (label, grams) => {
-    await addRecord('protein', { at: localIso(), day: dayKey(), label, grams });
+    await addRecord('protein', { at: localIso(atFor(day)), day, label, grams });
     toast(`+${grams} g de proteína`);
     ctx.refresh();
   };

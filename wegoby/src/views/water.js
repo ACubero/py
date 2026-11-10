@@ -2,29 +2,33 @@ import { html } from '../ui/html.js';
 import { icon } from '../ui/icons.js';
 import { readForm, toast, on } from '../ui/dom.js';
 import { recordsForDay, setSetting } from '../db/index.js';
-import { dayKey } from '../domain/dates.js';
+import { parseDayParam, dayLabel, dayKey } from '../domain/dates.js';
 import { waterTotal, waterReminderTimes } from '../domain/water.js';
 import { addWater, removeRecord } from '../services/records.js';
-import { loadSettings, formatLiters, timeOf, sourceNote } from './common.js';
+import { loadSettings, formatLiters, timeOf, sourceNote, dayNav, bindDayNav, atFor } from './common.js';
 import { progressRing, hourlyTotals, barChart } from '../ui/chart.js';
 import { pushPanel, bindPushPanel } from './push-panel.js';
 
 export const title = 'Agua';
 
-export async function render() {
+export async function render(ctx = {}) {
+  const day = parseDayParam(ctx.params?.[0]);
+  const label = dayLabel(day);
+  const isToday = day === dayKey();
   const { water } = await loadSettings('water');
-  const records = await recordsForDay('water', dayKey());
+  const records = await recordsForDay('water', day);
   const total = waterTotal(records);
   const times = waterReminderTimes(water);
 
   return html`
+    ${dayNav('agua', day)}
     <section class="card">
-      <div class="card-title">${icon('droplet')}<h2>Hoy</h2></div>
+      <div class="card-title">${icon('droplet')}<h2>${label}</h2></div>
       <div class="water-hero">
-        ${progressRing(total, water.goalMl, { label: 'Agua de hoy', value: formatLiters(total) })}
+        ${progressRing(total, water.goalMl, { label: `Agua: ${label}`, value: formatLiters(total) })}
         <div><p class="big-number">${formatLiters(total)}</p><p class="muted">de ${formatLiters(water.goalMl)}</p></div>
       </div>
-      ${barChart(hourlyTotals(records, 'ml', 7, 23), { label: 'Agua bebida hoy por horas', unit: 'ml', marks: water.remindersEnabled ? times.map((time) => Number(time.slice(0, 2))) : [] })}
+      ${barChart(hourlyTotals(records, 'ml', 7, 23), { label: `Agua bebida por horas: ${label}`, unit: 'ml', marks: isToday && water.remindersEnabled ? times.map((time) => Number(time.slice(0, 2))) : [] })}
       ${total >= water.goalMl ? html`<p class="small" style="margin-top:.5rem">Objetivo cumplido. Si hace calor, haces ejercicio o tienes vómitos o diarrea, bebe más.</p>` : ''}
       <div class="row" style="margin-top:1rem">
         ${[150, 250, 500].map((ml, index) => html`<button type="button" class="btn ${index === 1 ? 'btn-primary' : 'btn-soft'}" data-add="${ml}" style="flex:1">+${ml} ml</button>`)}
@@ -36,10 +40,10 @@ export async function render() {
       </form>
     </section>
     <section class="card">
-      <h2>Registro de hoy</h2>
+      <h2>Registro · ${label}</h2>
       ${records.length
         ? html`<ul class="list">${records.map((record) => html`<li><span>${timeOf(record.at)} · ${record.ml} ml</span><button type="button" class="icon-button" data-remove="${record.id}" aria-label="Borrar">${icon('trash')}</button></li>`)}</ul>`
-        : html`<p class="muted">Aún no has apuntado agua hoy.</p>`}
+        : html`<p class="muted">Sin agua apuntada este día.</p>`}
     </section>
     <section class="card">
       <h2>Consejos</h2>
@@ -67,8 +71,10 @@ export async function render() {
 }
 
 export function bind(root, ctx) {
+  const day = parseDayParam(ctx.params?.[0]);
+  bindDayNav(root, ctx);
   const add = async (ml) => {
-    await addWater(ml);
+    await addWater(ml, atFor(day));
     toast(`+${ml} ml`);
     ctx.refresh();
   };

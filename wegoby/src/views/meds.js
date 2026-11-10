@@ -2,16 +2,17 @@ import { html } from '../ui/html.js';
 import { icon } from '../ui/icons.js';
 import { readForm, toast, on } from '../ui/dom.js';
 import { recordsForDay, setSetting, deleteRecord } from '../db/index.js';
-import { dayKey } from '../domain/dates.js';
+import { parseDayParam, dayLabel } from '../domain/dates.js';
 import { dailyMedPlan, medConflicts, suggestCompanionTime, breakfastWindow, MED_LABELS } from '../domain/meds.js';
 import { logMed } from '../services/records.js';
-import { loadSettings, alertBox, sourceNote, timeOf } from './common.js';
+import { loadSettings, alertBox, sourceNote, timeOf, dayNav, bindDayNav, atFor } from './common.js';
 
 export const title = 'Medicación';
 
-export async function render() {
+export async function render(ctx = {}) {
+  const day = parseDayParam(ctx.params?.[0]);
   const { meds } = await loadSettings('meds');
-  const logs = await recordsForDay('medLogs', dayKey());
+  const logs = await recordsForDay('medLogs', day);
   const plan = dailyMedPlan(meds);
   const conflicts = medConflicts(meds);
   const breakfast = breakfastWindow(meds.levoTime);
@@ -19,8 +20,9 @@ export async function render() {
   const planCount = {};
 
   return html`
+    ${dayNav('medicacion', day)}
     <section class="card">
-      <h2>Hoy</h2>
+      <h2>${dayLabel(day)}</h2>
       ${plan.length
         ? html`<ul class="list">${plan.map((dose) => {
             planCount[dose.kind] = (planCount[dose.kind] ?? 0) + 1;
@@ -68,8 +70,10 @@ export async function render() {
 }
 
 export function bind(root, ctx) {
+  const day = parseDayParam(ctx.params?.[0]);
+  bindDayNav(root, ctx);
   on(root, 'click', '[data-take]', async (event, button) => {
-    await logMed(button.dataset.take);
+    await logMed(button.dataset.take, atFor(day));
     toast('Anotado.');
     ctx.refresh();
   });

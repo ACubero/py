@@ -3,7 +3,7 @@ import { readForm, toast, on } from '../ui/dom.js';
 import { recordsBetween, addRecord, deleteRecord } from '../db/index.js';
 import { dayKey, addDays, localIso, formatDay } from '../domain/dates.js';
 import { SYMPTOMS, SYMPTOM_GROUPS, SEVERITY_LABELS, evaluateSymptoms } from '../domain/symptoms.js';
-import { severityField, alertBox, deleteButton, timeOf } from './common.js';
+import { severityField, alertBox, deleteButton, timeOf, dayField, atFor } from './common.js';
 
 export const title = 'Síntomas';
 
@@ -23,6 +23,7 @@ export async function render() {
         ([group, label]) => html`<section class="card"><h2>${label}</h2>${SYMPTOMS.filter((symptom) => symptom.group === group).map((symptom) => severityField(symptom.id, symptom.label))}</section>`,
       )}
       <section class="card">
+        ${dayField('s-day')}
         <label class="check"><input type="checkbox" name="noFluids24h" /> Llevo más de 24 h sin poder retener líquidos</label>
         <div class="field"><label for="s-notes">Notas</label><textarea id="s-notes" name="notes" rows="2"></textarea></div>
         <button type="submit" class="btn btn-primary btn-block">Guardar</button>
@@ -45,7 +46,7 @@ export function bind(root, ctx) {
     event.preventDefault();
     const values = readForm(event.currentTarget);
     const items = Object.fromEntries(SYMPTOMS.map((symptom) => [symptom.id, Number(values[symptom.id] ?? 0)]));
-    const entry = { at: localIso(), day: dayKey(), items, noFluids24h: values.noFluids24h, notes: values.notes };
+    const entry = { at: localIso(atFor(values.day)), day: values.day, items, noFluids24h: values.noFluids24h, notes: values.notes };
     await addRecord('symptoms', entry);
     const alerts = evaluateSymptoms(entry);
     toast(alerts.length ? 'Guardado. Revisa los avisos.' : 'Guardado.');

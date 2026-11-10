@@ -1137,3 +1137,82 @@ th {
   gap: 1rem;
   align-items: center;
 }
+
+/* Day navigation and 7-day charts */
+
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.day-nav-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.day-nav input[type='date'] {
+  width: 100%;
+  min-height: 48px;
+}
+
+.week-charts {
+  display: grid;
+  gap: 1rem;
+}
+
+.week-charts figure {
+  margin: 0;
+}
+
+.week-charts figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.day-bars {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.day-bars .bar {
+  fill: var(--color-primary);
+  opacity: 0.75;
+}
+
+.day-bars .bar-met {
+  fill: var(--color-ok);
+}
+
+.day-bars .bar-selected {
+  opacity: 1;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.day-bars .goal {
+  stroke: var(--color-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.day-bars .baseline {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.day-bars text {
+  fill: var(--color-muted);
+  font-size: 10px;
+}
+
+@media (min-width: 820px) {
+  .week-charts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

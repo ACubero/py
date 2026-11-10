@@ -62,3 +62,27 @@ export function formatDay(key) {
 export function localIso(date = new Date()) {
   return `${dayKey(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
+
+export function parseDayParam(value, today = dayKey()) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value ?? '')) return today;
+  const date = fromDayKey(value);
+  if (Number.isNaN(date.getTime()) || dayKey(date) !== value) return today;
+  return value > today ? today : value;
+}
+
+export function dateOnDay(key, reference = new Date()) {
+  const date = fromDayKey(key);
+  date.setHours(reference.getHours(), reference.getMinutes(), reference.getSeconds(), 0);
+  return date;
+}
+
+export function lastDays(endKey, count) {
+  const end = fromDayKey(endKey);
+  return Array.from({ length: count }, (_, index) => dayKey(addDays(end, index - count + 1)));
+}
+
+export function dayLabel(key, today = dayKey()) {
+  if (key === today) return 'Hoy';
+  if (key === dayKey(addDays(fromDayKey(today), -1))) return 'Ayer';
+  return formatDay(key);
+}
