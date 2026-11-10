@@ -61,7 +61,7 @@ export const GUIDE = [
     points: [
       'Fuerza al menos 2 días por semana y 150–300 min de actividad aeróbica moderada a la semana, según tolere el tendón.',
       'Sin saltos, sin correr, sin ponerte de puntillas y sin subir escalones como ejercicio, salvo que tu fisio lo paute.',
-      'Lo que menos carga el tendón: natación y aquagym, ejercicios sentada o tumbada.',
+      'Lo que menos carga el tendón: ejercicios sentada o tumbada.',
       'Control del dolor: hasta 5/10 durante el ejercicio, que se calme a la mañana siguiente y que no empeore semana a semana.',
       'Calzado con algo de tacón y amortiguación.',
     ],

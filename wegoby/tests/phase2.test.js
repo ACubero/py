@@ -127,3 +127,13 @@ describe('doctor report (T29)', () => {
     expect(report.medDays).toBe(1);
   });
 });
+
+describe('no pool, bike or walking activities (L13)', () => {
+  it('excludes aquagym, stationary bike and walking from the catalog', () => {
+    const ids = EXERCISES.map((exercise) => exercise.id);
+    expect(ids).not.toContain('aquagym');
+    expect(ids).not.toContain('stationary-bike');
+    expect(ids).not.toContain('walking');
+    expect(JSON.stringify(EXERCISES).toLowerCase()).not.toMatch(/piscina|aquagym|nataci|bici|caminar/);
+  });
+});

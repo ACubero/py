@@ -2,7 +2,7 @@ const verifiedAt = '2026-11-10';
 
 const video = (id, title, channel, durationMin) => ({ id, title, channel, durationMin, verifiedAt });
 
-export const MATERIALS = { band: 'Goma', dumbbell: 'Mancuernas', none: 'Sin material', chair: 'Silla', water: 'Piscina', bike: 'Bici estática' };
+export const MATERIALS = { band: 'Goma', dumbbell: 'Mancuernas', none: 'Sin material', chair: 'Silla' };
 
 export const ZONES = {
   legs: 'Piernas y glúteo',
@@ -270,48 +270,6 @@ export const EXERCISES = [
       video('ck046Z0yNno', 'CALMA - COREO EN SILLA - Regalo para Rosita', 'Euge Carro', 4),
       video('67wl05H1K3U', 'Rutina de Entrenamiento en SILLA para ADULTOS MAYORES', 'Mariana Quevedo | Fisioterapia Querétaro', 20),
     ],
-  },
-  {
-    id: 'aquagym',
-    name: 'Aquagym o natación',
-    kind: 'aerobic',
-    zone: 'cardio',
-    materials: ['water'],
-    achilles: 'safe',
-    dose: { sets: '1 sesión', reps: '30–45 min' },
-    cues: ['Es lo que menos carga el tendón.', 'Evita saltos en la parte poco profunda.'],
-    mistakes: ['Saltar o impulsarse con las puntas en el fondo.'],
-    easier: 'Caminar en el agua.',
-    harder: 'Más tiempo.',
-    videos: [],
-  },
-  {
-    id: 'stationary-bike',
-    name: 'Bici estática',
-    kind: 'aerobic',
-    zone: 'cardio',
-    materials: ['bike'],
-    achilles: 'caution',
-    dose: { sets: '1 sesión', reps: '15–30 min' },
-    cues: ['Resistencia suave.', 'Pedalea con la parte media del pie, no con la punta.'],
-    mistakes: ['Resistencia alta de pie sobre los pedales.'],
-    easier: '10 min.',
-    harder: 'Más tiempo antes que más resistencia.',
-    videos: [],
-  },
-  {
-    id: 'walking',
-    name: 'Caminar',
-    kind: 'aerobic',
-    zone: 'cardio',
-    materials: ['none'],
-    achilles: 'caution',
-    dose: { sets: '1 sesión', reps: '10–30 min' },
-    cues: ['Terreno llano y calzado con algo de tacón y amortiguación.', 'Solo si el dolor del tendón cumple la regla de control.'],
-    mistakes: ['Cuestas y escaleras al principio.'],
-    easier: 'Paseos de 10 min.',
-    harder: 'Más minutos antes que más velocidad.',
-    videos: [],
   },
   {
     id: 'zumba-gold',
