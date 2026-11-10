@@ -4,3 +4,5 @@ dev-dist/
 .venv/
 .env
 .codegraph/
+.dev.vars
+.wrangler/

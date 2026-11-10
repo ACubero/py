@@ -3,6 +3,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { getSetting, onChange } from './db/index.js';
 import { applyDisplay } from './ui/dom.js';
 import { startRouter } from './router.js';
+import { startPushSync } from './push/client.js';
 
 const banner = document.getElementById('update-banner');
 const updateButton = document.getElementById('update-button');
@@ -20,4 +21,5 @@ onChange(async (store) => {
 });
 
 applyDisplay(await getSetting('display'));
+startPushSync();
 await startRouter();
