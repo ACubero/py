@@ -85,3 +85,23 @@ describe('phase 2 views', () => {
     expect(String(await labs.render({ params: [] }))).toContain('Evolución de la TSH');
   });
 });
+
+describe('phase 3 views', () => {
+  it('bp warns on a severe reading', async () => {
+    await addRecord('bp', { at: localIso(), day: dayKey(), sys: 185, dia: 100, pulse: 70 });
+    const view = await import('../src/views/bp.js');
+    expect(String(await view.render({ params: [] }))).toContain('112');
+  });
+  it('report renders tables for the chosen period', async () => {
+    const view = await import('../src/views/report.js');
+    const markup = String(await view.render({ params: ['12'] }));
+    expect(markup).toContain('Inyecciones');
+    expect(markup).toContain('<table>');
+  });
+  it('guide cites a source on every card', async () => {
+    const view = await import('../src/views/guide.js');
+    const markup = String(await view.render({ params: [] }));
+    const { GUIDE } = await import('../src/data/guide.js');
+    expect(markup.match(/Fuente:/g)).toHaveLength(GUIDE.length);
+  });
+});

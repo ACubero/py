@@ -96,3 +96,34 @@ describe('chart', () => {
     expect(linePath([{ x: 0, y: 5 }], { width: 100, height: 50, pad: 0 })).toBe('M50,25');
   });
 });
+
+import { buildReport } from '../src/domain/report.js';
+
+describe('doctor report (T29)', () => {
+  it('summarises only the selected period', () => {
+    const data = {
+      doses: [{ day: '2026-10-01', mg: 0.25 }, { day: '2026-11-02', mg: 0.25 }],
+      weights: [{ date: '2026-11-02', kg: 90 }],
+      labs: [],
+      bp: [],
+      workouts: [{ day: '2026-11-03', minutes: 30 }],
+      symptoms: [
+        { day: '2026-11-03', items: { nausea: 2, vomiting: 1 }, noFluids24h: false },
+        { day: '2026-11-04', items: { nausea: 3 }, noFluids24h: true },
+      ],
+      pain: [{ day: '2026-11-03', during: 4, morning: 2 }, { day: '2026-11-04', during: 2, morning: null }],
+      water: [{ day: '2026-11-03', ml: 1500 }, { day: '2026-11-03', ml: 500 }, { day: '2026-11-04', ml: 1000 }],
+      protein: [{ day: '2026-11-03', grams: 70 }],
+      medLogs: [{ day: '2026-11-03', kind: 'levo' }, { day: '2026-11-03', kind: 'levo' }, { day: '2026-11-04', kind: 'calcium' }],
+    };
+    const report = buildReport(data, '2026-11-01', '2026-11-07', 7);
+    expect(report.doses).toHaveLength(1);
+    expect(report.symptomDays).toEqual([{ label: 'Náuseas', days: 2 }]);
+    expect(report.noFluidsDays).toBe(1);
+    expect(report.painDuringAvg).toBe(3);
+    expect(report.painMorningAvg).toBe(2);
+    expect(report.waterAvgMl).toBe(429);
+    expect(report.proteinAvgG).toBe(10);
+    expect(report.medDays).toBe(1);
+  });
+});

@@ -62,11 +62,11 @@ Route: all inline unless a Writer trigger fires (record evidence here).
 - [x] T27 S6 · inline · Labs module: TSH, FT4, calcium; next-lab reminder; TSH vs weight chart.
 
 ### Phase 3 — Extras and quality
-- [ ] T28 S5 · inline · Optional blood-pressure + pulse log.
-- [ ] T29 S6 · inline · Doctor report (print CSS → PDF): doses, weight, TSH, symptoms, Achilles pain, BP.
-- [ ] T30 S7 · inline · Guide cards (nutrition, hydration, exercise, levothyroxine), offline, each claim with source.
-- [ ] T31 S7 · inline · Content rigor pass: verify every medical number against primary sources; `SOURCES.md`.
-- [ ] T32 S5 · inline · Lighthouse PWA/a11y/perf audit and fixes.
+- [x] T28 S5 · inline · Optional blood-pressure + pulse log.
+- [x] T29 S6 · inline · Doctor report (print CSS → PDF): doses, weight, TSH, symptoms, Achilles pain, BP.
+- [x] T30 S7 · inline · Guide cards (nutrition, hydration, exercise, levothyroxine), offline, each claim with source.
+- [x] T31 S7 · inline · Content rigor pass: verify every medical number against primary sources; `SOURCES.md`.
+- [x] T32 S5 · inline · Lighthouse PWA/a11y/perf audit and fixes.
 
 ## Log
 - L1 (2026-11-10) User: "mi mujer necesitará una pwa que le ayude, planifica qué debería tener"
@@ -80,3 +80,4 @@ Route: all inline unless a Writer trigger fires (record evidence here).
 - L9 (2026-11-10) T15–T16 inline. Design: server sends EMPTY VAPID push (no payload encryption needed); service worker recomputes due reminders locally with the shared `dueReminders` (60-min late window, de-dup via `pushLog`, water collapsed to latest). Endpoint allowlist (FCM, Mozilla, WNS, Apple), CORS single origin, token stored as SHA-256 hash, body ≤ 16 KB, ≤ 64 entries, 404/410 prunes device. Evidence: worker 18 tests + SW selection 4 tests, total 80/80; `vite build` (injectManifest) OK; `wrangler deploy --dry-run` bundles OK. T17 (deploy) needs user's Cloudflare account + explicit authorization; T18 needs her Android phone.
 - L10 (2026-11-10) Independent verifier on 77d2e5e: S4/S8/S9 PASS, 0 blockers; advisories A1–A5, A8 fixed in 87bc7e3 with regression tests (A2: reminders 23:46–23:59 never fired). A6/A7 (no pre-read size check; unauthenticated subscribe can create KV records) and A9 (dose reminder even if already logged) left as follow-ups.
 - L11 (2026-11-10) T19–T27 inline. Source check (T31 research) corrections applied: levothyroxine spacing now configurable, default 4 h, Spanish SmPC (Eutirox, AEMPS) minimum 2 h stated; breakfast "al menos 30 min"; optional EU 7.2 mg maintenance step; protein 1.2–1.6 g/kg (or 80–120 g/d), body-weight basis unclear per advisory, 0.4 factor has no primary source; Silbernagel threshold wording hedged; 180/110 labelled office cut-off. Evidence: 102/102 tests, build OK.
+- L12 (2026-11-10) T28–T32 inline. BP view (ESH 2023 thresholds), doctor report (print CSS, 4/8/12/26 weeks), sourced guide cards, SOURCES.md (per-figure verdict: confirmed/secondary/weak), README with push setup. Lighthouse 12.8.2 on `vite preview` (onboarding route, headless Chrome): performance 100, accessibility 100, best practices 100. Tests 106/106. Pending: T17 deploy (needs user's Cloudflare account and explicit authorization), T18 real-device check, M1–M4 user medical checks.
