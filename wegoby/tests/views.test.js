@@ -105,3 +105,14 @@ describe('phase 3 views', () => {
     expect(markup.match(/Fuente:/g)).toHaveLength(GUIDE.length);
   });
 });
+
+describe('today charts (L15)', () => {
+  it('shows the four daily rings and the hourly water chart', async () => {
+    const view = await import('../src/views/today.js');
+    const markup = String(await view.render({ params: [] }));
+    expect(markup.match(/class="ring /g)).toHaveLength(4);
+    for (const label of ['Agua', 'Proteína', 'Medicación', 'Fuerza (semana)']) expect(markup).toContain(`<figcaption>${label}</figcaption>`);
+    expect(markup).toContain('class="bars"');
+    expect(view.wide).toBe(true);
+  });
+});

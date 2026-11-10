@@ -5,7 +5,8 @@ import { recordsForDay, setSetting } from '../db/index.js';
 import { dayKey } from '../domain/dates.js';
 import { waterTotal, waterReminderTimes } from '../domain/water.js';
 import { addWater, removeRecord } from '../services/records.js';
-import { loadSettings, progressBar, formatLiters, timeOf, sourceNote } from './common.js';
+import { loadSettings, formatLiters, timeOf, sourceNote } from './common.js';
+import { progressRing, hourlyTotals, barChart } from '../ui/chart.js';
 import { pushPanel, bindPushPanel } from './push-panel.js';
 
 export const title = 'Agua';
@@ -19,11 +20,14 @@ export async function render() {
   return html`
     <section class="card">
       <div class="card-title">${icon('droplet')}<h2>Hoy</h2></div>
-      <p class="big-number">${formatLiters(total)} <span class="muted small">de ${formatLiters(water.goalMl)}</span></p>
-      ${progressBar(total, water.goalMl, 'Agua de hoy')}
+      <div class="water-hero">
+        ${progressRing(total, water.goalMl, { label: 'Agua de hoy', value: formatLiters(total) })}
+        <div><p class="big-number">${formatLiters(total)}</p><p class="muted">de ${formatLiters(water.goalMl)}</p></div>
+      </div>
+      ${barChart(hourlyTotals(records, 'ml', 7, 23), { label: 'Agua bebida hoy por horas', unit: 'ml', marks: water.remindersEnabled ? times.map((time) => Number(time.slice(0, 2))) : [] })}
       ${total >= water.goalMl ? html`<p class="small" style="margin-top:.5rem">Objetivo cumplido. Si hace calor, haces ejercicio o tienes vómitos o diarrea, bebe más.</p>` : ''}
       <div class="row" style="margin-top:1rem">
-        ${[150, 250, 500].map((ml) => html`<button type="button" class="btn btn-primary" data-add="${ml}">+${ml} ml</button>`)}
+        ${[150, 250, 500].map((ml, index) => html`<button type="button" class="btn ${index === 1 ? 'btn-primary' : 'btn-soft'}" data-add="${ml}" style="flex:1">+${ml} ml</button>`)}
       </div>
       <form id="water-custom" class="row" style="margin-top:.75rem">
         <label class="sr-only" for="water-ml">Otra cantidad en ml</label>

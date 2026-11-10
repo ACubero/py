@@ -71,6 +71,7 @@ export async function renderRoute() {
   const container = document.createElement('div');
   container.innerHTML = String(markup);
   root.replaceChildren(container);
+  root.classList.toggle('wide', Boolean(view.wide));
   renderNav(name);
   view.bind?.(container, ctx);
   root.focus({ preventScroll: true });

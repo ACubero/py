@@ -82,13 +82,13 @@ function catalogTable(list) {
       <label class="sr-only" for="filter-material">Material</label>
       <select id="filter-material" data-filter="material" style="flex:1"><option value="">Todo el material</option>${Object.entries(MATERIALS).map(([value, label]) => html`<option value="${value}">${label}</option>`)}</select>
     </div>
-    <div class="table-wrap"><table>
+    <div class="table-wrap"><table class="table-cards">
       <thead><tr><th>Ejercicio</th><th>Zona</th><th>Material</th></tr></thead>
       <tbody>${list.map(
         (exercise) => html`<tr data-zone="${exercise.zone}" data-materials="${exercise.materials.join(' ')}">
           <td><a href="#/ejercicio/${exercise.id}">${exercise.name}</a>${ACHILLES_TAG[exercise.achilles] ? html`<br /><span class="tag">${ACHILLES_TAG[exercise.achilles]}</span>` : ''}${exercise.videos.length ? html` <span class="small muted">· vídeo</span>` : ''}</td>
-          <td>${ZONES[exercise.zone]}</td>
-          <td>${exercise.materials.map((material) => MATERIALS[material]).join(', ')}</td>
+          <td data-label="Zona">${ZONES[exercise.zone]}</td>
+          <td data-label="Material">${exercise.materials.map((material) => MATERIALS[material]).join(', ')}</td>
         </tr>`,
       )}</tbody>
     </table></div>`;
