@@ -51,15 +51,15 @@ Route: all inline unless a Writer trigger fires (record evidence here).
 - [ ] T18 S1 S4 · inline · Real-device check on Android Chrome: install, offline, push with app closed.
 
 ### Phase 2 — Exercise, weight, labs
-- [ ] T19 S3 S5 S6 · inline · Exercise catalog JSON (name, zone, material, level, sets×reps, rest, cues, mistakes, easier/harder variant, videoId); Achilles-safe filter; routines A/B; progression weeks 1–2 / 3–6 / later.
-- [ ] T20 S3 S7 · inline · Curate and verify YouTube videos: Spanish, qualified physio/trainer, beginner/50+, low impact, heels down or seated/lying, < 15 min; store id, channel, duration, verifiedAt.
-- [ ] T21 S3 · inline · Exercise table UI: filters (material, zone), detail with `youtube-nocookie.com` click-to-load facade, offline text fallback.
-- [ ] T22 S3 S5 · inline · Workout log (type, minutes, RPE 0–10, discomfort) + weekly summary vs WHO (150–300 min aerobic, strength ≥ 2 d).
-- [ ] T23 S6 · inline · "Pautado por mi fisio": user-added exercises with sets, load, optional video URL.
-- [ ] T24 S6 · inline · Achilles pain monitoring + rule alert, configurable threshold. Tests.
-- [ ] T25 S3 S6 · inline · Low-impact cardio/dance catalog (aquagym, seated dance, stationary bike, walking); Zumba hidden unless physio flag enabled.
-- [ ] T26 S5 · inline · Weight & waist: weekly log, chart, % loss, waist reference 88 cm (ATP III).
-- [ ] T27 S6 · inline · Labs module: TSH, FT4, calcium; next-lab reminder; TSH vs weight chart.
+- [x] T19 S3 S5 S6 · inline · Exercise catalog JSON (name, zone, material, level, sets×reps, rest, cues, mistakes, easier/harder variant, videoId); Achilles-safe filter; routines A/B; progression weeks 1–2 / 3–6 / later.
+- [x] T20 S3 S7 · inline · Curate and verify YouTube videos: Spanish, qualified physio/trainer, beginner/50+, low impact, heels down or seated/lying, < 15 min; store id, channel, duration, verifiedAt.
+- [x] T21 S3 · inline · Exercise table UI: filters (material, zone), detail with `youtube-nocookie.com` click-to-load facade, offline text fallback.
+- [x] T22 S3 S5 · inline · Workout log (type, minutes, RPE 0–10, discomfort) + weekly summary vs WHO (150–300 min aerobic, strength ≥ 2 d).
+- [x] T23 S6 · inline · "Pautado por mi fisio": user-added exercises with sets, load, optional video URL.
+- [x] T24 S6 · inline · Achilles pain monitoring + rule alert, configurable threshold. Tests.
+- [x] T25 S3 S6 · inline · Low-impact cardio/dance catalog (aquagym, seated dance, stationary bike, walking); Zumba hidden unless physio flag enabled.
+- [x] T26 S5 · inline · Weight & waist: weekly log, chart, % loss, waist reference 88 cm (ATP III).
+- [x] T27 S6 · inline · Labs module: TSH, FT4, calcium; next-lab reminder; TSH vs weight chart.
 
 ### Phase 3 — Extras and quality
 - [ ] T28 S5 · inline · Optional blood-pressure + pulse log.
@@ -78,3 +78,5 @@ Route: all inline unless a Writer trigger fires (record evidence here).
 - L7 (2026-11-10) User: "empieza con T01". Done on branch `feat/wegoby-pwa` (repo root `C:\Proyectos\py`). Versions: vite 7.3.8, vite-plugin-pwa 2.0.0, vitest 5.1.0, @vite-pwa/assets-generator 2.0.0. `npm audit`: 6 low/moderate in build-time-only transitive deps (workbox-build, glob, minimatch, deepmerge); nothing shipped to the browser. SW uses `registerType: 'prompt'` with update banner. Next: T02.
 - L8 (2026-11-10) User: "sigue con el resto de tareas". T02–T14 inline (no Writer trigger: sequential dependent units). Evidence: RED per test file (missing modules / doseStatus) → GREEN 58/58 (foundation 13, domain 28, views smoke 17 with happy-dom + fake-indexeddb). Decisions: missed-dose rule implemented as SmPC wording "within 5 days" (≡ >48 h before next weekly dose); water reminder slots 15 min, last slot at bedtime−2 h only if ≥ interval/2 after previous; protein default 1.2 g/kg adjusted (Devine IBW + 0.4 excess), configurable; pen default 4 doses / 42 days, configurable, user told to check leaflet. T20 videos curated in background (32 IDs, oEmbed 200, 2026-11-10).
 - L9 (2026-11-10) T15–T16 inline. Design: server sends EMPTY VAPID push (no payload encryption needed); service worker recomputes due reminders locally with the shared `dueReminders` (60-min late window, de-dup via `pushLog`, water collapsed to latest). Endpoint allowlist (FCM, Mozilla, WNS, Apple), CORS single origin, token stored as SHA-256 hash, body ≤ 16 KB, ≤ 64 entries, 404/410 prunes device. Evidence: worker 18 tests + SW selection 4 tests, total 80/80; `vite build` (injectManifest) OK; `wrangler deploy --dry-run` bundles OK. T17 (deploy) needs user's Cloudflare account + explicit authorization; T18 needs her Android phone.
+- L10 (2026-11-10) Independent verifier on 77d2e5e: S4/S8/S9 PASS, 0 blockers; advisories A1–A5, A8 fixed in 87bc7e3 with regression tests (A2: reminders 23:46–23:59 never fired). A6/A7 (no pre-read size check; unauthenticated subscribe can create KV records) and A9 (dose reminder even if already logged) left as follow-ups.
+- L11 (2026-11-10) T19–T27 inline. Source check (T31 research) corrections applied: levothyroxine spacing now configurable, default 4 h, Spanish SmPC (Eutirox, AEMPS) minimum 2 h stated; breakfast "al menos 30 min"; optional EU 7.2 mg maintenance step; protein 1.2–1.6 g/kg (or 80–120 g/d), body-weight basis unclear per advisory, 0.4 factor has no primary source; Silbernagel threshold wording hedged; 180/110 labelled office cut-off. Evidence: 102/102 tests, build OK.

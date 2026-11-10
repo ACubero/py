@@ -15,6 +15,7 @@ export const DEFAULTS = {
     levoEnabled: true,
     levoTime: '07:00',
     levoDose: '',
+    spacingMin: 240,
     calciumEnabled: false,
     calciumTimes: ['14:00'],
     ironEnabled: false,

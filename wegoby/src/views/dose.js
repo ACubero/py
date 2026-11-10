@@ -12,6 +12,7 @@ import {
   penStatus,
   lastDose,
   INJECTION_SITES,
+  withMaintenance72,
 } from '../domain/dose.js';
 import { loadSettings, alertBox, deleteButton, sourceNote } from './common.js';
 
@@ -81,7 +82,7 @@ export async function render() {
       <ul class="list">${schedule.map(
         (step) => html`<li><span><strong>${step.mg} mg</strong> ${step === currentStep ? html`<span class="tag">ahora</span>` : ''}</span><span class="muted small">${formatDay(step.startDay)} → ${step.endDay ? formatDay(step.endDay) : 'mantenimiento'}</span></li>`,
       )}</ul>
-      ${sourceNote('ficha técnica de Wegovy (EMA): subida cada 4 semanas hasta 2,4 mg. Tu médico puede retrasar una subida si no la toleras.')}
+      ${sourceNote('ficha técnica de Wegovy (EMA): subida cada 4 semanas hasta 2,4 mg. Tu médico puede retrasar una subida si no la toleras. La ficha europea permite además subir a 7,2 mg tras al menos 4 semanas con 2,4 mg en adultos con IMC ≥ 30, solo si lo pauta tu médico.')}
     </section>
     <section class="card">
       <h2>Historial</h2>
@@ -105,6 +106,7 @@ export async function render() {
               : html`<input aria-label="Semanas con ${step.mg} mg" name="weeks-${index}" type="number" min="1" max="52" value="${step.weeks}" style="max-width:6rem" />`}</div>`,
           )}
         </fieldset>
+        <label class="check"><input type="checkbox" name="maintenance72" ${treatment.steps.at(-1).mg === 7.2 ? 'checked' : ''} /> Mi médico ha pautado 7,2 mg de mantenimiento</label>
         <div class="field"><label for="p-doses">Dosis por bolígrafo</label><input id="p-doses" name="dosesPerPen" type="number" min="1" max="10" value="${penSettings.dosesPerPen}" /></div>
         <div class="field"><label for="p-days">Días de uso tras abrirlo</label><input id="p-days" name="inUseDays" type="number" min="1" max="120" value="${penSettings.inUseDays}" /></div>
         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -144,7 +146,8 @@ export function bind(root, ctx) {
     event.preventDefault();
     const values = readForm(event.currentTarget);
     const { treatment } = await loadSettings('treatment');
-    const steps = treatment.steps.map((step, index) => (step.weeks === null ? step : { ...step, weeks: values[`weeks-${index}`] ?? step.weeks }));
+    let steps = treatment.steps.map((step, index) => (step.weeks === null ? step : { ...step, weeks: values[`weeks-${index}`] ?? step.weeks }));
+    steps = withMaintenance72(steps, values.maintenance72);
     await setSetting('treatment', { startDate: values.startDate, weekday: Number(values.weekday), doseTime: values.doseTime, steps });
     await setSetting('pen', { dosesPerPen: values.dosesPerPen, inUseDays: values.inUseDays });
     toast('Ajustes guardados.');

@@ -9,6 +9,7 @@ import {
   penStatus,
   INJECTION_SITES,
   doseStatus,
+  withMaintenance72,
 } from '../src/domain/dose.js';
 import { medConflicts, suggestCompanionTime, breakfastWindow } from '../src/domain/meds.js';
 import { waterTotal, waterReminderTimes } from '../src/domain/water.js';
@@ -212,5 +213,23 @@ describe('reminders across midnight (verifier A2)', () => {
   it('applies the water goal of the previous day to wrapped water entries', () => {
     const entries = [{ kind: 'water', time: '23:50' }];
     expect(dueReminders(entries, { day: '2026-11-17', weekday: 2, minutes: 0 }, { waterGoalMetDay: '2026-11-16' })).toEqual([]);
+  });
+});
+
+describe('levothyroxine spacing is configurable (T31 source check)', () => {
+  it('uses the spacing chosen by the clinician, e.g. 2 h from the Spanish SmPC', () => {
+    const meds = { ...DEFAULTS.meds, levoTime: '07:00', calciumEnabled: true, calciumTimes: ['09:30'], spacingMin: 120 };
+    expect(medConflicts(meds)).toEqual([]);
+    expect(medConflicts({ ...meds, spacingMin: 240 })).toEqual([{ kind: 'calcium', time: '09:30', gapMin: 150 }]);
+    expect(suggestCompanionTime('07:00', 120)).toBe('09:00');
+  });
+});
+
+describe('optional 7.2 mg maintenance (EU SmPC, T31)', () => {
+  it('adds 7.2 mg after at least 4 weeks on 2.4 mg and removes it again', () => {
+    const with72 = withMaintenance72(DEFAULT_DOSE_STEPS, true);
+    expect(with72.slice(-2)).toEqual([{ mg: 2.4, weeks: 4 }, { mg: 7.2, weeks: null }]);
+    expect(withMaintenance72(with72, false)).toEqual(DEFAULT_DOSE_STEPS);
+    expect(withMaintenance72(DEFAULT_DOSE_STEPS, false)).toBe(DEFAULT_DOSE_STEPS);
   });
 });

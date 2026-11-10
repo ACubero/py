@@ -35,7 +35,7 @@ export async function render() {
     ${conflicts.map((conflict) =>
       alertBox({
         level: 'warning',
-        message: `${MED_LABELS[conflict.kind]} a las ${conflict.time} queda a ${Math.round(conflict.gapMin / 6) / 10} h de la levotiroxina. Sepáralo al menos 4 h (sugerencia: ${suggestCompanionTime(meds.levoTime)}).`,
+        message: `${MED_LABELS[conflict.kind]} a las ${conflict.time} queda a ${Math.round(conflict.gapMin / 6) / 10} h de la levotiroxina. Sepáralo al menos ${meds.spacingMin / 60} h (sugerencia: ${suggestCompanionTime(meds.levoTime, meds.spacingMin)}).`,
       }),
     )}
     ${meds.levoEnabled
@@ -43,8 +43,8 @@ export async function render() {
           <div class="card-title">${icon('pill')}<h2>Cómo tomar la levotiroxina</h2></div>
           <ul>
             <li>En ayunas, con un vaso de agua (no café, zumo ni leche).</li>
-            <li>Desayuno entre las ${breakfast.from} y las ${breakfast.to}.</li>
-            <li>Calcio, hierro y antiácidos: al menos 4 h de separación.</li>
+            <li>Desayuno a partir de las ${breakfast.from} (al menos media hora después).</li>
+            <li>Calcio, hierro y antiácidos: sepáralos de la levotiroxina. La ficha española (Eutirox, AEMPS) indica al menos 2 h; otras fichas, como la de EE. UU., 4 h. La app usa ${meds.spacingMin / 60} h: cámbialo abajo si tu médico indica otra cosa.</li>
             <li>Café, soja y comidas muy ricas en fibra pueden reducir su absorción: mantén siempre la misma rutina.</li>
             <li>Al perder peso puedes necesitar menos dosis. Tu endocrino decidirá cuándo revisar la TSH; anota las analíticas en «Analíticas».</li>
           </ul>
@@ -57,6 +57,7 @@ export async function render() {
         <label class="check"><input type="checkbox" name="levoEnabled" ${meds.levoEnabled ? 'checked' : ''} /> Levotiroxina</label>
         <div class="field"><label for="m-levo-time">Hora</label><input id="m-levo-time" name="levoTime" type="time" value="${meds.levoTime}" /></div>
         <div class="field"><label for="m-levo-dose">Dosis</label><input id="m-levo-dose" name="levoDose" type="text" value="${meds.levoDose}" placeholder="p. ej. 100 µg" /></div>
+        <div class="field"><label for="m-spacing">Separación con calcio y hierro</label><select id="m-spacing" name="spacingMin">${[[120, '2 h (mínimo de la ficha española)'], [180, '3 h'], [240, '4 h']].map(([value, label]) => html`<option value="${value}" ${value === meds.spacingMin ? 'selected' : ''}>${label}</option>`)}</select></div>
         <label class="check"><input type="checkbox" name="calciumEnabled" ${meds.calciumEnabled ? 'checked' : ''} /> Calcio o calcitriol</label>
         <div class="field"><label for="m-calcium">Horas del calcio (separadas por comas)</label><input id="m-calcium" name="calciumTimes" type="text" inputmode="numeric" value="${meds.calciumTimes.join(', ')}" pattern="^\\s*\\d{2}:\\d{2}(\\s*,\\s*\\d{2}:\\d{2})*\\s*$" /><span class="hint">Formato 14:00, 21:00</span></div>
         <label class="check"><input type="checkbox" name="ironEnabled" ${meds.ironEnabled ? 'checked' : ''} /> Hierro</label>
@@ -83,7 +84,7 @@ export function bind(root, ctx) {
       .split(',')
       .map((time) => time.trim())
       .filter((time) => /^\d{2}:\d{2}$/.test(time));
-    await setSetting('meds', { ...values, calciumTimes: calciumTimes.length ? calciumTimes : ['14:00'] });
+    await setSetting('meds', { ...values, spacingMin: Number(values.spacingMin), calciumTimes: calciumTimes.length ? calciumTimes : ['14:00'] });
     toast('Medicación guardada.');
     ctx.refresh();
   });

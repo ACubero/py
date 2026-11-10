@@ -53,7 +53,7 @@ export async function render() {
         <label class="check"><input type="checkbox" name="useAdjustedWeight" ${protein.useAdjustedWeight ? 'checked' : ''} /> Usar peso ajustado</label>
         <button type="submit" class="btn btn-primary">Guardar</button>
       </form>
-      ${sourceNote('consenso ACLM/ASN/OMA/TOS 2025 sobre nutrición con GLP-1 (prioriza proteína y ejercicio de fuerza); se han propuesto hasta 1,2–1,5 g/kg/día con evidencia limitada. Peso ajustado = peso ideal (Devine) + 0,4 × (peso real − peso ideal), una convención clínica entre varias.')}
+      ${sourceNote('consenso ACLM/ASN/OMA/TOS 2025 sobre nutrición con GLP-1 (prioriza proteína y ejercicio de fuerza); durante la pérdida de peso se han propuesto 1,2–1,6 g/kg/día (o 80–120 g/día), con evidencia limitada, y el propio consenso reconoce que no está claro si calcularlo sobre el peso real, el ajustado o el ideal. Peso ajustado = peso ideal (Devine) + 0,4 × (peso real − peso ideal): convención de farmacocinética, sin fuente primaria para este uso.')}
     </section>`;
 }
 

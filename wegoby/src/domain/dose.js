@@ -83,3 +83,10 @@ export function doseStatus(treatment, doses, now = new Date()) {
   scheduledAt.setHours(hours, minutes, 0, 0);
   return { state: 'missed', nextDay, mg, advice: missedDoseAdvice(scheduledAt, now) };
 }
+
+export function withMaintenance72(steps, enabled) {
+  const has72 = steps.at(-1).mg === 7.2;
+  if (enabled && !has72) return [...steps.slice(0, -1), { ...steps.at(-1), weeks: steps.at(-1).weeks ?? 4 }, { mg: 7.2, weeks: null }];
+  if (!enabled && has72) return [...steps.slice(0, -2), { ...steps.at(-2), weeks: null }];
+  return steps;
+}

@@ -48,3 +48,40 @@ describe('views render with seeded data', () => {
     expect(String(await view.render({ params: [] }))).toContain('Sepáralo al menos 4 h');
   });
 });
+
+describe('phase 2 views', () => {
+  beforeAll(async () => {
+    await seed();
+    await setSetting('exercise', { physioCleared: true });
+    await addRecord('pain', { day: dayKey(), during: 7, morning: null });
+    await addRecord('physioExercises', { name: '<b>excéntrico</b>', sets: '3', reps: '15', load: '', videoUrl: '', notes: '' });
+    await addRecord('labs', { date: '2026-11-01', tsh: 1.2, ft4: null, calcium: null, notes: '' });
+    await addRecord('labs', { date: '2026-12-01', tsh: 0.8, ft4: null, calcium: null, notes: '' });
+    await addRecord('weights', { date: '2026-12-01', kg: 86, waistCm: null });
+  });
+
+  it('exercise shows routines, pain alert and escapes physio input once cleared', async () => {
+    const view = await import('../src/views/exercise.js');
+    const markup = String(await view.render({ params: [] }));
+    expect(markup).toContain('Rutina A');
+    expect(markup).toContain('Silbernagel');
+    expect(markup).toContain('&lt;b&gt;excéntrico&lt;/b&gt;');
+    expect(markup).not.toContain('zumba-gold');
+  });
+
+  it('exercise detail renders a click-to-load video facade without contacting YouTube', async () => {
+    const view = await import('../src/views/exercise.js');
+    const markup = String(await view.render({ params: ['glute-bridge'] }));
+    expect(markup).toContain('data-video="zkCABP4bzlU"');
+    expect(markup).not.toContain('<iframe');
+    expect(markup).not.toContain('ytimg');
+    expect(String(await view.render({ params: ['zumba-gold'] }))).toContain('no disponible');
+  });
+
+  it('weight and labs render charts', async () => {
+    const weight = await import('../src/views/weight.js');
+    const labs = await import('../src/views/labs.js');
+    expect(String(await weight.render({ params: [] }))).toContain('<svg class="chart"');
+    expect(String(await labs.render({ params: [] }))).toContain('Evolución de la TSH');
+  });
+});

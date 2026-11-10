@@ -1,6 +1,7 @@
 import { parseTime, formatTime } from './dates.js';
 
 export const LEVO_SPACING_MIN = 240;
+export const LEVO_SPACING_MIN_ES_SMPC = 120;
 
 export const MED_LABELS = {
   levo: 'Levotiroxina',
@@ -24,11 +25,11 @@ export function medConflicts(meds) {
   if (!meds.levoEnabled) return [];
   return companionDoses(meds)
     .map((dose) => ({ ...dose, gapMin: circularGap(dose.time, meds.levoTime) }))
-    .filter((dose) => dose.gapMin < LEVO_SPACING_MIN);
+    .filter((dose) => dose.gapMin < (meds.spacingMin ?? LEVO_SPACING_MIN));
 }
 
-export function suggestCompanionTime(levoTime) {
-  return formatTime(parseTime(levoTime) + LEVO_SPACING_MIN);
+export function suggestCompanionTime(levoTime, spacingMin = LEVO_SPACING_MIN) {
+  return formatTime(parseTime(levoTime) + spacingMin);
 }
 
 export function breakfastWindow(levoTime) {

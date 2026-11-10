@@ -7,9 +7,9 @@ export const LAB_REMINDER_TIME = '20:00';
 export const REMINDER_TEXT = {
   water: { title: 'Hora de beber agua', body: 'Unos sorbos ahora. Toca para apuntarlo.', url: '/#/agua' },
   dose: { title: 'Hoy toca Wegovy', body: 'Inyección semanal. Toca para registrarla.', url: '/#/dosis' },
-  levo: { title: 'Levotiroxina', body: 'En ayunas, solo con agua. Desayuno en 30–60 min.', url: '/#/medicacion' },
-  calcium: { title: 'Calcio', body: 'Toma de calcio (separada 4 h de la levotiroxina).', url: '/#/medicacion' },
-  iron: { title: 'Hierro', body: 'Toma de hierro (separada 4 h de la levotiroxina).', url: '/#/medicacion' },
+  levo: { title: 'Levotiroxina', body: 'En ayunas, solo con agua. Desayuno al menos 30 min después.', url: '/#/medicacion' },
+  calcium: { title: 'Calcio', body: 'Toma de calcio, separada de la levotiroxina.', url: '/#/medicacion' },
+  iron: { title: 'Hierro', body: 'Toma de hierro, separada de la levotiroxina.', url: '/#/medicacion' },
   lab: { title: 'Mañana: analítica', body: 'Revisa si debes ir en ayunas y cuándo tomar la levotiroxina.', url: '/#/analiticas' },
 };
 
