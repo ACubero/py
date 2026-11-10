@@ -35,7 +35,9 @@ async function readJson(request) {
   const text = await request.text();
   if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) throw new HttpError(413, 'Body too large');
   try {
-    return text ? JSON.parse(text) : {};
+    const parsed = text ? JSON.parse(text) : {};
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
+    return parsed;
   } catch {
     throw new HttpError(400, 'Invalid JSON');
   }
@@ -49,7 +51,7 @@ function validateSubscription(subscription) {
   } catch {
     throw new HttpError(400, 'Invalid subscription');
   }
-  if (url.protocol !== 'https:' || !PUSH_HOSTS.some((pattern) => pattern.test(url.hostname))) throw new HttpError(400, 'Unsupported push service');
+  if (url.protocol !== 'https:' || url.port !== '' || !PUSH_HOSTS.some((pattern) => pattern.test(url.hostname))) throw new HttpError(400, 'Unsupported push service');
   const keys = subscription.keys ?? {};
   if (typeof keys.p256dh !== 'string' || typeof keys.auth !== 'string') throw new HttpError(400, 'Invalid subscription');
   return { endpoint: subscription.endpoint, keys: { p256dh: keys.p256dh, auth: keys.auth } };
@@ -58,7 +60,7 @@ function validateSubscription(subscription) {
 function validateEntries(entries) {
   if (!Array.isArray(entries) || entries.length > MAX_ENTRIES) throw new HttpError(400, 'Invalid entries');
   return entries.map((entry) => {
-    if (!entry || !(entry.kind in REMINDER_TEXT) || !TIME.test(entry.time)) throw new HttpError(400, 'Invalid entry');
+    if (!entry || typeof entry !== 'object' || !Object.hasOwn(REMINDER_TEXT, entry.kind) || !TIME.test(entry.time)) throw new HttpError(400, 'Invalid entry');
     const clean = { kind: entry.kind, time: entry.time };
     if (entry.weekday !== undefined) {
       if (!Number.isInteger(entry.weekday) || entry.weekday < 0 || entry.weekday > 6) throw new HttpError(400, 'Invalid entry');
@@ -162,8 +164,12 @@ async function runReminders(env, scheduledTime) {
       if (!device) continue;
       const due = dueReminders(device.entries, localParts(now, device.timeZone), { waterGoalMetDay: device.waterGoalMetDay });
       if (!due.length) continue;
-      const response = await sendEmptyPush(device.subscription, env, { ttl: 1800 });
-      if (response.status === 404 || response.status === 410) await env.DEVICES.delete(name);
+      try {
+        const response = await sendEmptyPush(device.subscription, env, { ttl: 1800 });
+        if (response.status === 404 || response.status === 410) await env.DEVICES.delete(name);
+      } catch {
+        continue;
+      }
     }
     cursor = page.list_complete ? undefined : page.cursor;
   } while (cursor);

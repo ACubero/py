@@ -197,3 +197,28 @@ describe('scheduled reminders', () => {
     expect(env.DEVICES.map.size).toBe(1);
   });
 });
+
+describe('verifier advisories', () => {
+  it('rejects explicit ports, inherited kinds and null bodies', async () => {
+    expect((await subscribe({ subscription: { ...SUBSCRIPTION, endpoint: 'https://fcm.googleapis.com:8443/fcm/send/x' } })).response.status).toBe(400);
+    expect((await subscribe({ entries: [{ kind: 'constructor', time: '09:00' }] })).response.status).toBe(400);
+    expect((await request('POST', '/api/subscribe', { raw: 'null' })).status).toBe(400);
+    const { data } = await subscribe();
+    expect((await request('POST', '/api/water-goal', { raw: 'null', token: data.token })).status).toBe(400);
+  });
+
+  it('keeps notifying other devices when one push fails at network level', async () => {
+    await subscribe({ entries: [{ kind: 'water', time: '09:00' }] });
+    await subscribe({ subscription: { ...SUBSCRIPTION, endpoint: 'https://fcm.googleapis.com/fcm/send/second' }, entries: [{ kind: 'water', time: '09:00' }] });
+    let calls = 0;
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      calls += 1;
+      if (calls === 1) throw new TypeError('network');
+      return new Response(null, { status: 201 });
+    }));
+    await worker.scheduled({ scheduledTime: Date.parse('2026-11-17T08:00:00Z') }, env, { waitUntil: () => {} });
+    vi.unstubAllGlobals();
+    expect(calls).toBe(2);
+    expect(env.DEVICES.map.size).toBe(2);
+  });
+});

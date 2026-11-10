@@ -26,12 +26,15 @@ export function buildReminderSchedule({ treatment, meds, water, labs }) {
 }
 
 export function dueReminders(entries, local, { waterGoalMetDay = null, windowMin = SLOT_MIN } = {}) {
+  const previous = { day: dayKey(addDays(fromDayKey(local.day), -1)), weekday: (local.weekday + 6) % 7 };
   return entries.filter((entry) => {
     const minutes = parseTime(entry.time);
-    if (!(minutes > local.minutes - windowMin && minutes <= local.minutes)) return false;
-    if (entry.weekday !== undefined && entry.weekday !== local.weekday) return false;
-    if (entry.date !== undefined && entry.date !== local.day) return false;
-    if (entry.kind === 'water' && waterGoalMetDay === local.day) return false;
+    const ago = (local.minutes - minutes + 1440) % 1440;
+    if (ago >= windowMin) return false;
+    const { day, weekday } = minutes > local.minutes ? previous : local;
+    if (entry.weekday !== undefined && entry.weekday !== weekday) return false;
+    if (entry.date !== undefined && entry.date !== day) return false;
+    if (entry.kind === 'water' && waterGoalMetDay === day) return false;
     return true;
   });
 }

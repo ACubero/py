@@ -202,3 +202,15 @@ describe('dose status for today (S2)', () => {
     expect(doseStatus({ ...treatment, startDate: null }, [], new Date()).state).toBe('unset');
   });
 });
+
+describe('reminders across midnight (verifier A2)', () => {
+  it('fires entries scheduled in the last window before midnight on the next tick', () => {
+    const entries = [{ kind: 'levo', time: '23:50' }, { kind: 'dose', weekday: 1, time: '23:55' }, { kind: 'lab', date: '2026-11-16', time: '23:59' }];
+    expect(dueReminders(entries, { day: '2026-11-17', weekday: 2, minutes: 0 }).map((entry) => entry.kind)).toEqual(['levo', 'dose', 'lab']);
+    expect(dueReminders(entries, { day: '2026-11-17', weekday: 2, minutes: 15 })).toEqual([]);
+  });
+  it('applies the water goal of the previous day to wrapped water entries', () => {
+    const entries = [{ kind: 'water', time: '23:50' }];
+    expect(dueReminders(entries, { day: '2026-11-17', weekday: 2, minutes: 0 }, { waterGoalMetDay: '2026-11-16' })).toEqual([]);
+  });
+});

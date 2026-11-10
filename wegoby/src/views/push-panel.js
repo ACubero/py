@@ -20,7 +20,7 @@ export async function pushPanel() {
     ${state === 'enabled'
       ? html`<div class="row"><button type="button" class="btn" data-push="test">Probar</button><button type="button" class="btn btn-danger" data-push="disable">Desactivar</button></div>`
       : ''}
-    <p class="small muted" style="margin-top:.75rem">Privacidad: el servidor de avisos solo guarda la suscripción, las horas de los avisos y tu zona horaria. Tus datos de salud nunca salen del móvil; el aviso llega vacío y el texto se genera en el propio móvil.</p>
+    <p class="small muted" style="margin-top:.75rem">Privacidad: el servidor de avisos solo guarda la suscripción, las horas y el tipo de cada aviso (agua, Wegovy, levotiroxina, calcio, hierro, analítica), tu zona horaria y si hoy ya cumpliste el objetivo de agua (sí/no). Tus datos de salud nunca salen del móvil; el aviso llega vacío y el texto se genera en el propio móvil.</p>
   </section>`;
 }
 
